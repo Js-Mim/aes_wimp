@@ -1,6 +1,7 @@
 # AES 2nd Workshop on Intelligent Music Production
 
 Support material and source code for the following work: S.I. Mimilakis, E. Cano, J. Abesser, G. Schuller, "Separation and Remixing of Solo Instruments from Jazz Recordings using Deep Neural Networks", to appear in the 2nd Audio Engineering Workshop for Intelligent Music Production, 13th September, 2016, London.
+Please use the above citation in case you find any of the code useful to your work.
 
 For code usage, please refer to each class. Examples are given inside method or in the "main()" call.
 
