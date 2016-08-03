@@ -71,16 +71,6 @@ class FrequencyMasking:
 			else :
 				FrequencyMasking.applyReverseMask(self)
 
-		elif (self._method == 'LWiener'):
-			FrequencyMasking.LeakageWiener(self)
-			if not(reverse) :
-				FrequencyMasking.applyMask(self)
-			else :
-				FrequencyMasking.applyReverseMask(self)
-
-		elif (self._method == 'CEWiener'):
-			FrequencyMasking.conistentEWiener(self)
-
 		return self._Out
 
 	def IRM(self):
