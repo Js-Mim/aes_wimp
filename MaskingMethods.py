@@ -161,8 +161,14 @@ class FrequencyMasking:
 		"""
 		print('Harmonizable Process with alpha:', str(self._alpha))
 		localsTarget = self._sTarget ** self._alpha
-		localnResidual = self._nResidual ** self._alpha
-
+		numElements = len(self._nResidual)
+		if numElements > 1:
+			localnResidual = self._nResidual[0] ** self._alpha
+			for indx in range(1, numElements):
+				localnResidual += self._nResidual[indx] ** self._alpha
+		else :
+			localnResidual = self._nResidual ** self._alpha
+			 
 		self._mask = np.divide((localsTarget + self._eps), (self._eps + localnResidual))
 
 	def phaseSensitive(self):
