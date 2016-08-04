@@ -10,7 +10,7 @@ from TFMethods import TimeFrequencyDecomposition as TF
 from MaskingMethods import FrequencyMasking as fm
 import scipy.signal as sig
 import numpy as np
-import Pickle as pickle
+import cPickle as pickle
 import IOMethods as IO
 import os, sys
 
@@ -116,8 +116,19 @@ def remix_solo(x):
     """
     # Load models using pickle
     print('Loading models')
-    ww = pickle.load(open('solo_suppression_mag.p', 'rb'))
-    wwpan = pickle.load(open('pannet_mag.p', 'rb'))
+
+    # Check for os, to avoid some windows crushes
+    plat = sys.platform
+    if plat  == 'linux' or plat == 'linux2' or plat == 'darwin' :
+        ww = pickle.load(open('solo_suppression_mag.p', 'rb'))
+        wwpan = pickle.load(open('pannet_mag.p', 'rb'))
+    else :
+        fileA = open('solo_suppression_mag.p', 'rb')
+        ww = pickle.load(fileA,encoding='latin1')
+        fileB = open('pannet_mag.p', 'rb')
+        wwpan = pickle.load(fileB,encoding='latin1')
+        del fileA, fileB
+
 
     # Left/Right/Mid Analysis
     xL = x[:, 0]
@@ -162,10 +173,10 @@ def remix_solo(x):
 
     # Stereo instrumentation
     print('Estimating accompaniment instrumentation')
-    mask = fm(LmX, hl, hl + (LmX-hl).clip(0.), [], [], alpha = 1.33, method = 'alphaWiener')
+    mask = fm(LmX, hl, [hl, (LmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
     mshatL = mask(reverse = True)
 
-    mask = fm(RmX, hl, hl + (RmX-hl).clip(0.), [], [], alpha = 1.33, method = 'alphaWiener')
+    mask = fm(RmX, hl, [hl, (RmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
     mshatR = mask(reverse = True)
 
     # Time-domain reconstruction
@@ -221,23 +232,24 @@ if __name__ == '__main__':
 
     # Iterate over the list of files
     for indx in filelist:
-        xfilename = os.path.join(loadpath, indx)
-        # Reading
-        x, fs = IO.AudioIO.wavRead(xfilename, mono = False)
-        # Check for clipped audio data
-        if np.max(np.abs(x)) >= 0.99 :
-            print('Clipping')
-            locx = np.where(np.abs(x) >= 0.93)
-            x[locx[0], locx[1]] = 0.93 * np.sign(x[locx[0], locx[1]])
+    	if not indx.startswith('.'):
+	        xfilename = os.path.join(loadpath, indx)
+	        # Reading
+	        x, fs = IO.AudioIO.wavRead(xfilename, mono = False)
+	        # Check for clipped audio data
+	        if np.max(np.abs(x)) >= 0.99 :
+	            print('Clipping')
+	            locx = np.where(np.abs(x) >= 0.93)
+	            x[locx[0], locx[1]] = 0.93 * np.sign(x[locx[0], locx[1]])
 
-        # Feed the system
-        xa, yhat, yhatb, ymix = remix_solo(x)
+	        # Feed the system
+	        xa, yhat, yhatb, ymix = remix_solo(x)
 
-        # Original Audio file
-        #IO.AudioIO.sound(xa, fs)
-        # Estimated solo instrumet
-        IO.AudioIO.wavWrite(yhat, fs, 16, xfilename[:-4]+'_solo.wav')
-        # Estimated accompaniment music
-        IO.AudioIO.wavWrite(yhatb, fs, 16, xfilename[:-4]+'_acc.wav')
-        # Automatic Mixture
-        IO.AudioIO.wavWrite(ymix, fs, 16, xfilename[:-4]+'_remixed.wav')
+	        # Original Audio file
+	        #IO.AudioIO.sound(xa, fs)
+	        # Estimated solo instrumet
+	        IO.AudioIO.wavWrite(yhat, fs, 16, xfilename[:-4]+'_solo.wav')
+	        # Estimated accompaniment music
+	        IO.AudioIO.wavWrite(yhatb, fs, 16, xfilename[:-4]+'_acc.wav')
+	        # Automatic Mixture
+	        IO.AudioIO.wavWrite(ymix, fs, 16, xfilename[:-4]+'_remixed.wav')
