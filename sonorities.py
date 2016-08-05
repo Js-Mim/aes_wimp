@@ -173,10 +173,10 @@ def remix_solo(x):
 
     # Stereo instrumentation
     print('Estimating accompaniment instrumentation')
-    mask = fm(LmX, hl, [hl, (LmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
+    mask = fm(LmX, hl, [(LmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
     mshatL = mask(reverse = True)
 
-    mask = fm(RmX, hl, [hl, (RmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
+    mask = fm(RmX, hl, [(RmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
     mshatR = mask(reverse = True)
 
     # Time-domain reconstruction
