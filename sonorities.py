@@ -129,13 +129,15 @@ def remix_solo(x):
         wwpan = pickle.load(fileB,encoding='latin1')
         del fileA, fileB
 
-
+    hop = 512
+    N = 4096
+    wsz = 2049
     # Left/Right/Mid Analysis
     xL = x[:, 0]
     xR = x[:, 1]
-    MmX, MpX = TF.STFT((xL+xR) * 0.5, sig.bartlett(2049, True), 4096, 1024)
-    LmX, LpX = TF.STFT(xL, sig.bartlett(2049, True), 4096, 1024)
-    RmX, RpX = TF.STFT(xR, sig.bartlett(2049, True), 4096, 1024)
+    MmX, MpX = TF.STFT((xL+xR) * 0.5, sig.bartlett(wsz, True), N, hop)
+    LmX, LpX = TF.STFT(xL, sig.bartlett(wsz, True), N, hop)
+    RmX, RpX = TF.STFT(xR, sig.bartlett(wsz, True), N, hop)
 
     print('Extracting Solo Information')
     ### Hidden Layer Representation 1
@@ -169,19 +171,19 @@ def remix_solo(x):
     hl = ((act + (1. - Trs) * hl) + eps)
 
     # Monophonic Solo
-    yhat = TF.iSTFT(hl, MpX, 2049, 1024)
+    yhat = TF.iSTFT(hl, MpX, wsz, hop)
 
     # Stereo instrumentation
     print('Estimating accompaniment instrumentation')
-    mask = fm(LmX, hl, [(LmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
+    mask = fm(LmX, hl, [(LmX-hl).clip(0.)], [], [], alpha = 1.3, method = 'alphaWiener')
     mshatL = mask(reverse = True)
 
-    mask = fm(RmX, hl, [(RmX-hl).clip(0.)], [], [], alpha = 1.33, method = 'alphaWiener')
+    mask = fm(RmX, hl, [(RmX-hl).clip(0.)], [], [], alpha = 1.3, method = 'alphaWiener')
     mshatR = mask(reverse = True)
 
     # Time-domain reconstruction
-    yhatbL = TF.iSTFT(mshatL, LpX, 2049, 1024)
-    yhatbR = TF.iSTFT(mshatR, RpX, 2049, 1024)
+    yhatbL = TF.iSTFT(mshatL, LpX, wsz, hop)
+    yhatbR = TF.iSTFT(mshatR, RpX, wsz, hop)
 
     yhatb = np.vstack((yhatbL, yhatbR)).T
 
@@ -226,8 +228,8 @@ if __name__ == '__main__':
         raise IOError('Trained Models Not Found! Please refer to README file!')
 
     # Path for audio files
-    loadpath = 'wav/'
-    savepath = 'wav/'
+    loadpath = 'val_audio/'
+    savepath = 'val_audio/'
     filelist = sorted(os.listdir(loadpath))
 
     # Iterate over the list of files
@@ -235,7 +237,7 @@ if __name__ == '__main__':
     	if not indx.startswith('.'):
 	        xfilename = os.path.join(loadpath, indx)
 	        # Reading
-	        x, fs = IO.AudioIO.wavRead(xfilename, mono = False)
+	        x, fs = IO.AudioIO.audioRead(xfilename, mono = False)
 	        # Check for clipped audio data
 	        if np.max(np.abs(x)) >= 0.99 :
 	            print('Clipping')
