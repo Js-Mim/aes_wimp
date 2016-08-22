@@ -228,8 +228,8 @@ if __name__ == '__main__':
         raise IOError('Trained Models Not Found! Please refer to README file!')
 
     # Path for audio files
-    loadpath = 'val_audio/'
-    savepath = 'val_audio/'
+    loadpath = 'wav/'
+    savepath = 'wav/'
     filelist = sorted(os.listdir(loadpath))
 
     # Iterate over the list of files
@@ -237,7 +237,7 @@ if __name__ == '__main__':
     	if not indx.startswith('.'):
 	        xfilename = os.path.join(loadpath, indx)
 	        # Reading
-	        x, fs = IO.AudioIO.audioRead(xfilename, mono = False)
+	        x, fs = IO.AudioIO.wavRead(xfilename, mono = False)
 	        # Check for clipped audio data
 	        if np.max(np.abs(x)) >= 0.99 :
 	            print('Clipping')
