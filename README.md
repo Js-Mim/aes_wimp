@@ -1,7 +1,8 @@
 # AES 2nd Workshop on Intelligent Music Production
 
-Support material and source code for the following work: S.I. Mimilakis, E. Cano, J. Abesser, G. Schuller, "New  Sonorities for Jazz Recordings: Separation and Mixing using Deep Neural Networks", submitted to the 2nd Audio Engineering Society Workshop on Intelligent Music Production, 13th September, 2016, London.
-Please use the above citation if you find any of the code useful to your work.
+Support material and source code for the following work: S.I. Mimilakis, E. Cano, J. Abesser, G. Schuller, "New  Sonorities for Jazz Recordings: Separation and Mixing using Deep Neural Networks", in Proceedings of the 2nd AES Workshop on Intelligent Music Production, London, UK, 13 September 2016.
+
+Please use the above citation if you find any of the code useful.
 
 For code usage, please refer to each class. Examples are given inside method or in the "main()" call.
 
